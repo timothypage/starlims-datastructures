@@ -1,0 +1,463 @@
+/********************************************************************************
+Description.. :	XMLParser
+				root		- the "root" XMLElement ( clsXMLelement ) 
+				
+				parse_log  /* a log for debugging a bad parse 
+				malformed 	- Is this string of XML a failed parse?
+				xml_text 	- the string of xml text to parse.
+				child_counter - counter for giving the child xml elements unique id's
+
+Methods...... : 
+				explode (needle, haystack) - this should be a string function, but it "explodes" a string into an array based on a needle.
+				countChars (needle, haystack) - this returns a count of a needle in a haystack.
+				
+				parse (text) - this parses an XML string / file contents into a tree.
+				
+				toTreeView - this returns a 2d array including children for creating a TreeView, starting with Root.
+				LOGIT - stuff log messages into Me:parse_log
+
+				
+				parseChildElements - For a given subset of Me:xml_text, find all the child elements.
+								 	- then parse all the children of those children.
+									
+				findChildElement - in a string of XML, find the first child element.
+
+Parameters... :	- 
+
+Returns...... :	- 
+
+Author....... :	WOLANSKIP
+Date......... : 2011-03-30
+********************************************************************************
+_______________________________________________________________________________
+
+Modification. : 
+Author....... :	
+Date......... :	
+_______________________________________________________________________________
+********************************************************************************/;
+
+:CLASS XMLParser ;
+
+/* An XML parser takes a string of XML text and turns it into something readable. ;
+
+:DECLARE root ; /* An xml document must have all elements fit into one root node ;
+:DECLARE parse_log ; /* a log for debugging a bad parse ;
+:DECLARE malformed ;
+
+:DECLARE xml_text ;
+
+:DECLARE stack ;
+:DECLARE child_counter ;
+
+:PROCEDURE constructor ;
+	Me:child_counter := 0 ;
+	Me:malformed := .F. ;
+	Me:parse_log := "" ;
+	Me:root := NIL ;
+	Me:xml_text := "" ;
+:ENDPROC;
+
+
+
+
+
+:PROCEDURE parse ;
+	:PARAMETERS text ;
+	
+	:DECLARE sBuffer ;
+
+	/* Given a text buffer, parse out the XML tree. 
+	
+		Step 1: Separate the XML header from the remainder.
+	;
+	
+	
+	/* todo: re implmenet checks for header - such as counting < and > for equality ;
+	
+
+	Me:xml_text := Me:explode( "?>", text) ;
+	
+	Me:xml_text := Me:xml_text[2] ;
+	
+	Me:LOGIT( 0, "Separated XML text from header. Text:" + CHR(13) + Me:xml_text ) ;
+	Me:root := CreateUdObject( "Parsers.clsXMLElement" );
+	Me:root:id := Me:child_counter ++ ;
+	
+	Me:root := Me:parseChildElements(Me:root, 1, LEN( Me:xml_text ) ) ;
+
+:ENDPROC;
+
+
+
+/* The point of this procedure is to push elements onto the stack. and parse the results from there.;
+
+/*
+
+	Algorithm:
+	
+Plan:
+
+Function parseElement( element,  <string of text > )
+{
+
+Given <string of text>,
+
+Until reach end of <string of text>
+ - Find node.
+  - If no nodes found:
+	Set element:Value =  String value of Text
+	:RETURN
+  - else
+	- Find end of node.
+	- Create node and attach to element:children.
+	- store string indexes.
+Loop
+
+Foreach <child node>
+	parseElement( element:<child_node>[i], string owned by child_node  )
+
+:RETURN
+}
+;
+
+
+:PROCEDURE parseChildElements;
+	:PARAMETERS parent, start_index, end_index, depth;
+	
+	:DEFAULT depth, 0 ;
+
+	:DECLARE string_of_xml;
+	
+	/* have to add 1 to the length of the string since the array indices start at 1;
+	string_of_xml := substr( Me:xml_text, start_index, ( end_index - start_index ) + 1 ) ;
+
+	
+	:DECLARE child ;
+	:DECLARE child_start_index;
+	:DECLARE child_end_index ;
+	:DECLARE child_end_tag ;
+	
+	:DECLARE end_tag ;
+	
+	child_start_index := {} ;
+	child_end_index :=   {} ;
+	child_end_tag   :=   {} ;
+	
+	Me:LOGIT( depth, "parseChildElements(): begin on depth " + limsstring(depth) , depth );
+	
+	:WHILE LEN(string_of_xml) > 0 ;
+		
+		child := Me:findChildElement( string_of_xml ,depth + 1 ) ;
+		
+		:IF !empty(child) ;
+			/* increment the start index ;			
+			child:id := Me:child_counter ++ ;
+			
+			/*Me:LOGIT( depth, "parseChildElements(): Start Index (" + limsstring( at( ">",  string_of_xml ) + 1) + " in " + string_of_xml, depth ) ;
+			
+			:DECLARE prepend;
+			
+			:IF LEN( child_end_index ) = 0 ;
+				prepend := start_index  ;
+			:ELSE;
+				prepend := child_end_index[LEN(child_end_index)] + LEN( child_end_tag[LEN(child_end_tag)]) ;
+			:ENDIF;
+			
+			Me:LOGIT( depth, "parseChildElements(): Found Element. Start Index (" + limsstring( at( ">",  string_of_xml ) ) + "+" + limsstring(prepend) + "=" + LimsString(at( ">",  string_of_xml )  + prepend) + "), Name: " + child:name, depth )  ;
+			
+			
+			aAdd( child_start_index, at( ">",  string_of_xml )  + prepend  ) ;
+			
+			:DECLARE short_end_idx;
+			:DECLARE normal_end_idx;
+			
+			short_end_idx := at( "/>", string_of_xml );
+			normal_end_idx := at("</" + child:name + ">", string_of_xml );
+			
+			:IF short_end_idx > 0 .AND. short_end_idx < normal_end_idx  ;
+				end_tag := "/>";
+				
+				Me:LOGIT( depth,  "parseChildElements(): Found Element. Short End Index (" + limsstring( short_end_idx ) + "+" + limsstring(prepend) +  "-1=" + LimsString( short_end_idx + prepend - 1) + "), Name: " + child:name, depth )  ;
+				aAdd( child_end_index  , short_end_idx + prepend - 1 ) ;
+			:ELSE;
+				end_tag := "</" + child:name + ">" ;
+				Me:LOGIT( depth,  "parseChildElements(): Found Element. Normal End Index (" + limsstring( normal_end_idx ) + "+" + limsstring(prepend) + "-1=" + LimsString( normal_end_idx + prepend - 1) + "), Name: " + child:name, depth )  ;
+				
+				aAdd( child_end_index  , normal_end_idx + prepend - 1 ) ;
+			:ENDIF;
+			
+			aAdd( child_end_tag , end_tag ) ;
+			
+			/* Only parse looking for siblings after the end of the first child ;			
+			string_of_xml := substr( string_of_xml, child_end_index[LEN(child_end_index)] + LEN(end_tag) - prepend + 1  ) ;
+			
+			/* save the child  ;
+			aAdd( parent:children, child ) ;
+		:ELSE;
+			parent:value := ALLTRIM(string_of_xml) ; /* whatever remains ;
+			:IF parent:value = CHR(13);
+				parent:value := "";
+			:ENDIF;
+			Me:LOGIT( depth, "parseChildElements(): assign value to parent [" + parent:value  + "]", depth ) ;
+			string_of_xml := ""; ;
+		:ENDIF;
+		
+		string_of_xml := AllTrim( string_of_xml ) ;
+		
+	:ENDWHILE;
+	
+	:DECLARE i ;
+	
+	:FOR i := 1 :TO len( parent:children ) ;
+		
+		Me:LOGIT( depth, "parseChildElements[" + limsstring(i) + "]: " + chr(13) +
+						 "Child_start_index[" + limsstring(child_start_index[i]) + "]" + chr(13) + 
+						 "                 child_end_index[" + limsstring(child_end_index[i] ) + "]"  + chr(13) +
+						 "                 String: " 
+							+ substr( Me:xml_text, child_start_index[i], ( (child_end_index[i] ) - child_start_index[i] -1)  ) 
+						, depth );
+		
+		
+		Me:parseChildElements( parent:children[i], child_start_index[i] , child_end_index[i] - 1 , depth + 2) ;	
+		
+		
+	:NEXT;
+	
+	Me:LOGIT( depth, "parseChildElements(): end", depth );
+	
+	/* If depth is 0, we're looking for a root element. 
+		The root element should only have 1 child. Otherwise it's malformed. *;
+	
+	:IF depth = 0 ;
+		:IF LEN( parent:children ) <> 1 ;
+			Me:malformed := .T. ;
+			Me:LOGIT( 0, "ParseChildElements(): Malformed Root Node : children count != 1 :" + limsstring( LEN(parent:children ) ) ) ;
+			:RETURN NIL ;
+		:ELSE;
+			:RETURN parent:children[1];
+		:ENDIF;
+	:ELSE;
+		:RETURN parent ;
+	:ENDIF;
+:ENDPROC;
+	
+	
+
+
+
+
+
+
+:PROCEDURE findChildElement ;
+:PARAMETERS string_of_xml, depth ;
+	:DEFAULT depth, 0;
+	/* basically, find THE FIRST TAG in string_of_xml ;
+	/* Tags can take the following forms:
+	
+		<element> .... </element> (where "element" matches)
+		<element />
+	
+		The following exception occurs on the first line:
+		<?xml version="1.0" encoding="UTF-8" ?>
+	;
+	
+	
+	:DECLARE element_name ;
+	:DECLARE lineSpan ;
+	
+	
+	lineSpan := 0 ;
+	element := CreateUdObject( "Parsers.clsXMLElement" );
+	
+	/*------------------------- Open Tag, and Attributes ;
+	
+	:DECLARE element, attributes, value ;
+	
+	:DECLARE open_tag_begin ;
+	:DECLARE open_tag_end   ;
+	:DECLARE open_tag_space ;
+	
+	:DECLARE string ;
+	string := string_of_xml ;
+	
+	open_tag_begin := At( "<", string ) + 1 ; /* < ; 
+	open_tag_end   := At( ">", string ) - 1;  /* > ;
+	open_tag_space := At( " ", SubStr( string, open_tag_begin, open_tag_end - open_tag_begin ) );
+	
+	Me:LOGIT(depth, "findChildElement(): String: " + string, depth );
+	
+	:IF open_tag_space > 0 .AND. open_tag_begin > 1 .AND. open_tag_space < open_tag_end ;
+		element:name := substr( string, open_tag_begin, open_tag_space ) ;
+		Me:LOGIT(depth, "findChildElement(): Open Tag with Attributes : " + element:name, depth );
+		element:parse_attributes( Me:explode( " ", substr( string, open_tag_space + 3, open_tag_end - open_tag_space -2) ) ) ;
+	:ELSE;	
+		:IF open_tag_begin < open_tag_end ;
+			
+			/*usrmes("string:"  + string + chr(13) 
+					+ "open tag begin:" + limsstring(open_tag_begin) + chr(13)
+					+ "open tag end:" + limsstring(open_tag_end)
+					);
+			
+			element:name := substr( string, open_tag_begin, ((open_tag_end - open_tag_begin) + 1) ) ;
+			Me:LOGIT(depth, "findChildElement(): Open Tag No Attributes : " + element:name, depth );
+		:ELSE;
+			Me:LOGIT(depth, "findChildElement(): No element found ", depth);
+			:RETURN NIL;
+		:ENDIF;
+	:ENDIF;
+	
+	:IF open_tag_end = 0 ;
+		:RETURN NIL;
+	:ENDIF;
+	
+	element:name := alltrim(element:name);
+	
+	
+	/* ----- If the 2nd to last character is a /, it's an empty element (closes itself!);
+	
+	/*usrmes(Me:parse_log);
+	
+	:IF string[ open_tag_end ] = "/" ;
+		/*usrmes("Empty element!");
+		:RETURN element ;	
+	:ELSE;
+		/*usrmes("Didn't find end tag. Found: " + Me:xml_text[ open_tag_end ] );
+	:ENDIF;
+	
+	
+	/* --------------- OTHERWISE FIND CLOSING TAG, and VALUE ;
+	
+	
+	:DECLARE string ;
+	string := substr( string, open_tag_end + 2 ) ;
+	
+	
+	:DECLARE close_tag_begin ;
+	:DECLARE close_tag_end   ;
+	:DECLARE close_tag_space , i;
+	
+	
+	
+	close_tag_begin := At( "</" + element:name  + ">", string )  ; /* < ; 
+	
+	Me:LOGIT(1, "findChildElement(): Looking for closing tag: [" +"</" + element:name  + ">" + "] ", depth );
+	
+	:IF close_tag_begin > 0;
+		/*element:value := substr( string, 1, close_tag_begin - 1 ) ;
+		Me:LOGIT( depth, "findChildElement(): Found closing tag: [" +"</" + element:name  + ">" + "]", depth);
+	:ELSE;
+		Me:LOGIT( depth, "findChildElement(): Failed to find closing tag: [" +"</" + element:name  + ">" + "]", depth);
+		Me:malformed := .T. ;
+	:ENDIF;
+
+	:IF Me:malformed = .T. ;
+		:RETURN NIL;
+	:ELSE;
+		:RETURN element  ;	
+	:ENDIF;
+
+:ENDPROC;
+
+
+
+:PROCEDURE countChars ;
+	:PARAMETERS needle, haystack ;
+	
+	:DECLARE buffer ;
+	:DECLARE sIdx, count;
+	
+	buffer := {} ;
+	sIdx := 0;
+	count := 0;
+		
+	
+	:WHILE !empty(haystack) ;
+		
+		sIdx := At( needle, haystack );
+		
+		:IF sIdx = 0 ;
+			sIdx := Len(haystack)  ;
+		:ELSE;
+			sIdx := sIdx + ( len(needle) - 1 ) ;
+			count := count + 1 ;
+		:ENDIF;
+		
+		haystack := Right( haystack, Len(haystack) - ( sIdx )  );
+
+	:ENDWHILE;
+	
+	:RETURN count ;
+	
+
+:ENDPROC;
+
+
+:PROCEDURE explode ;
+	:PARAMETERS delimiter, string ;
+	
+	:DECLARE buffer ;
+	:DECLARE sIdx, count;
+	
+	buffer := {} ;
+	sIdx := 0;
+	count := 0;
+	
+	
+	
+	:WHILE !empty(string) ;
+		
+		sIdx := At( delimiter, string );
+		
+		:IF sIdx = 0 ;
+			sIdx := Len(string)  ;
+		:ELSE;
+			sIdx := sIdx + ( len(delimiter) - 1 ) ;
+		:ENDIF;
+		
+		aAdd( buffer , Left(string, sIdx) );
+		
+		/*usrmes("String:" + string + chr(13) +
+				"Len(string): " + limsstring(len(string)) + CHR(13) +
+				"Piece: " + LEFT(string, sIdx) + CHR(13) +
+				"Len (delimiter):"  + limsstring(len(delimiter)) + CHR(13) +
+				"Index: " + limsstring(sIdx)
+				);
+		string := Right( string, Len(string) - (sIdx )  );
+	
+
+	:ENDWHILE;
+	
+	:RETURN buffer;
+:ENDPROC;
+
+
+:PROCEDURE toTreeView ;
+	/* make an array... of .. treenode values .. ;
+
+	/*( {'Name', 'Text', 'Value', 'Parent', 'Image', 'SelectedImage'} );
+	
+	:RETURN Me:root:toTree();
+
+:ENDPROC;
+
+
+:PROCEDURE LOGIT;
+:PARAMETERS linenumber, message, indentation_count ;
+:DEFAULT indentation_count, 0 ;	
+
+	:DECLARE i, indentation;
+	
+	:IF indentation_count >  0;
+		:FOR i := 1 :TO indentation_count :STEP 1;
+			indentation := indentation + "   ";
+		:NEXT;
+		Me:parse_log := Me:parse_log + indentation + message + CHR(13) + CHR(10) ;
+	:ELSE;
+		Me:parse_log := Me:parse_log + "Line " + LimsString( linenumber ) + ": " + message + CHR(13) + CHR(10) ;	
+	:ENDIF;
+	/*usrmes( Me:parse_log );
+:ENDPROC;
+
+
+

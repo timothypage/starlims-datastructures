@@ -1,0 +1,92 @@
+/********************************************************************************
+Description.. :	
+
+Parameters... :	- 
+
+Returns...... :	- 
+
+Author....... :	ZWOLAKT
+Date......... : 2012-06-14
+********************************************************************************
+_______________________________________________________________________________
+
+Ticket #..... :	
+Modification. : 
+Author....... :	
+Date......... :	
+_______________________________________________________________________________
+********************************************************************************/;
+enter := Chr(13) + Chr(10);
+ob := "";
+
+queue := CreateUdObject("DataStructures.clsQueue", {} ) ;
+
+ob += "testing queue..." + enter ;
+ob += "Going to queue chars: a,b,c" + enter ;
+
+ob += 'Queueing "a"...';
+queue:put("a");
+:IF queue:peek() == "a" ;
+	ob += "Passed" + enter;
+:ELSE;
+	ob += "FAILED!" + enter;
+:ENDIF;
+
+ob += 'Queueing "b"...';
+queue:put("b");
+:IF queue:peek() == "a" ;
+	ob += "Passed" + enter;
+:ELSE;
+	ob += "FAILED!" + enter;
+:ENDIF;
+
+ob += 'Queueing "c"...';
+queue:put("c");
+:IF queue:peek() == "a" ;
+	ob += "Passed" + enter;
+:ELSE;
+	ob += "FAILED!" + enter;
+:ENDIF;
+
+ob += "size is 3?...";
+:IF queue:size() == 3;
+	ob += "true" + enter;
+:ELSE;
+	ob += "FALSE" + enter;
+:ENDIF;
+ob += 'Dequeueing "a"...';
+:IF queue:get() == "a";
+	ob += "Passed" + enter;
+:ELSE;
+	ob += "FAILED!" + enter;
+:ENDIF;
+
+ob += "size is 2?...";
+:IF queue:size() == 2;
+	ob += "true" + enter;
+:ELSE;
+	ob += "FALSE" + enter;
+:ENDIF;
+
+ob += 'Dequeueing "b"...';
+:IF queue:get() == "b";
+	ob += "Passed" + enter;
+:ELSE;
+	ob += "FAILED!" + enter;
+:ENDIF;
+
+ob += "size is 1?...";
+:IF queue:size() == 1;
+	ob += "true" + enter;
+:ELSE;
+	ob += "FALSE" + enter;
+:ENDIF;
+
+ob += 'Dequeueing "c"...';
+:IF queue:get() == "c";
+	ob += "Passed" + enter;
+:ELSE;
+	ob += "FAILED!" + enter;
+:ENDIF;
+
+:RETURN ob;

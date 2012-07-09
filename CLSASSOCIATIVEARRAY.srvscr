@@ -1,0 +1,195 @@
+/********************************************************************************
+Description.. :	clsAssociativeArray 
+
+Parameters... :	NONE
+
+Returns...... :	An object that is an associative array.
+
+Author....... :	WOLANSKIP
+Date......... : 2011-08-02
+********************************************************************************
+_______________________________________________________________________________
+
+Ticket #..... :	
+Modification. : 
+Author....... :	
+Date......... :	
+_______________________________________________________________________________
+********************************************************************************/;
+
+
+:CLASS AssociativeArray ;
+
+:DECLARE _keys   ;
+:DECLARE _values ;
+
+:PROCEDURE constructor;
+	:PARAMETERS keys, values ;
+
+	/* initialize the keys and values arrays ;
+	Me:_keys := {} ;
+	Me:_values := {} ;
+	
+	:IF empty( keys ) .OR. empty(values) ; /* if no parameters sent, we're done here ;
+		:RETURN;
+	:ENDIF;
+	
+	:IF ( Len(keys) > 0 ) .AND. ( Len(keys) == Len(values) ) ;
+		:DECLARE i ;
+		:FOR i := 1 :TO Len(keys) :STEP 1 ;
+			Me:update(keys[i], values[i]) ;		
+		:NEXT;
+	:ENDIF;
+	
+:ENDPROC;
+
+
+/* Does a key exist in the array? ;
+
+:PROCEDURE exists;
+	:PARAMETERS needle ;
+	
+	:DECLARE i;
+	
+	needle := LimsString(needle);
+		
+	:FOR i := 1 :TO LEN(Me:_keys) :STEP 1;
+		:IF Me:_keys[i] = needle .AND. LEN(Me:_keys[i]) = LEN(needle) ;
+			:RETURN .T.;
+		:ENDIF;
+	:NEXT;
+	
+	:RETURN .F. ;
+	
+	
+:ENDPROC;
+
+:PROCEDURE find_key ;
+	:PARAMETERS needle ;
+	
+	:DECLARE i;
+	
+	needle := LimsString(needle);
+		
+	:FOR i := 1 :TO LEN(Me:_keys) :STEP 1;
+		:IF Me:_keys[i] = needle ;
+			:RETURN i;
+		:ENDIF;
+	:NEXT;
+	
+	RaiseError( "Associative Array key not found!", "DataStructures.clsAssociatievArray:find_key()", 12534 );
+	
+:ENDPROC;
+
+:PROCEDURE update ;
+	:PARAMETERS key, value ;
+	
+	/* If the key already exists, overwrite the value. ;
+	:IF Me:exists( key ) ;
+		Me:_values[ Me:find_key(key) ] := value ;	
+	:ELSE;
+		aAdd( Me:_keys, key ) ; 
+		aAdd( Me:_values, value ) ;
+	:ENDIF;
+	
+:ENDPROC;
+
+
+:PROCEDURE lookup ;
+	:PARAMETERS key, value ;
+	:IF Me:exists( key ) ;
+		:RETURN Me:_values[ Me:find_key(key) ]  ;
+	:ELSE;
+		:RETURN NIL ;
+	:ENDIF;
+
+:ENDPROC;
+
+:PROCEDURE toString;
+
+	:DECLARE buffer;
+	:DECLARE i;
+	
+	buffer := "{" + CHR(13) ;
+	
+	:FOR i := 1 :TO LEN( Me:_keys ) :STEP 1 ;
+		buffer := buffer + CHR(9) + LimsString( Me:_keys[i] ) + " => " + LimsString( Me:_values[i] ) + CHR(13) ;
+	:NEXT;
+
+	buffer := buffer + "}";
+	
+	:RETURN buffer ;
+:ENDPROC;
+
+
+/*
+/*:PROCEDURE insertionSort ;
+/*:PARAMETERS  A, nStart, nCount, cbOrder ;
+/*
+/*:DEFAULT nStart, 2;
+/*:DEFAULT nCount, LEN(A) ;
+/*:DEFAULT cbOrder, {|x, y| x >= y} ;
+/* 
+/*/*{ This procedure sorts in ascending order. };
+/*:DECLARE i, j, code;
+/*	:FOR i := nStart :TO nCount  ;
+/*        value := A[i];
+/*        j := i -1 ;
+/*        done := .F. ;
+/*        :WHILE ( !done ) ;			
+/*            :IF eval(cbOrder, A[j], value )  ;
+/*                A[j + 1] := A[j];
+/*                j := j - 1 ;
+/*                :IF j < 1 ;
+/*                    done := .T. ;
+/*				:ENDIF;
+/*			:ELSE;
+/*                done := .T. ;
+/*			:ENDIF;
+/*        :ENDWHILE;
+/*        A[j + 1] := value;
+/*    :NEXT;
+/*	
+/*:RETURN A;
+/*:ENDPROC;
+
+
+:PROCEDURE sort ;
+	:PARAMETERS cbOrder;
+	:DEFAULT cbOrder, {|x, y| x >= y} ;
+	
+	/* for now just do a parallel sort... ;
+	
+	/* you have to track the original indexes and where they went to. or just sort inline.;
+
+
+	:DECLARE i, j;
+	:DECLARE swap_key;
+	:DECLARE swap_value;
+	
+	:FOR i := 1 :TO ( LEN( Me:_keys  ) -1 ) ;
+		:FOR j := (i + 1) :TO ( LEN( Me:_keys ) ) ;
+			
+			  :IF eval(cbOrder, Me:_keys[i], Me:_keys[j] )  ; 
+				
+				swap_key := Me:_keys[i] ;
+				swap_value := Me:_values[i];
+				
+				Me:_keys[i] := Me:_keys[j] ;
+				Me:_values[i] := Me:_values[j] ;
+				
+				Me:_keys[j] := swap_key ;
+				Me:_values[j] := swap_value;
+				
+			:ENDIF;
+			
+		:NEXT;
+	:NEXT;
+
+:ENDPROC;
+
+:PROCEDURE size ;
+	:RETURN LEN(Me:_keys);
+:ENDPROC;
+
+

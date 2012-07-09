@@ -1,0 +1,75 @@
+/********************************************************************************
+Description.. :	
+
+Parameters... :	- 
+
+Returns...... :	- 
+
+Author....... :	WOLANSKIP
+Date......... : 2011-08-02
+********************************************************************************
+_______________________________________________________________________________
+
+Ticket #..... :	
+Modification. : 
+Author....... :	
+Date......... :	
+_______________________________________________________________________________
+********************************************************************************/;
+
+
+
+
+:DECLARE a, b;
+
+
+a := "L00019235" ; 
+b := "L00019234" ;
+
+/*:RETURN a < b;
+
+
+
+
+
+:DECLARE datas;
+:DECLARE i;
+:DECLARE soils ;
+
+soils := CreateUdObject("DataStructures.clsAssociativeArray", {} ) ;
+
+
+datas := RunDS("BatchJobSQLs.Lead_Soil_Info_By_Folderno", {} ); 
+
+/*:FOR i := 1 :TO LEN( datas ) ;
+/*	
+/*	soils:update( datas[i][2], datas[i][1] ); /* assign folderno => mdch ;
+/*	soils:update( limsstring(i), limsstring(i) );
+/*:NEXT;
+
+
+soils:update( "11", "4" );
+soils:update( "1", "1" );
+soils:update( "2.2.2", "3");
+soils:update( "2.2", "2" );
+
+/*.AND. LEFT(x, AT(x, '.') ) = LEFT(y, AT(y, '.'))  
+				.AND. 	
+			} ;
+			
+	
+soils:sort( { |x, y|
+					(
+						
+						(  AT('.', x) > 0 .AND. At('.', y) > 0 .AND. VAL(LEFT(x, AT('.', x) )) >= VAL(LEFT(y, AT('.', y))) .AND. x > y ) 
+						.OR.
+						(  AT('.', x) = 0 .AND. At('.', y) > 0 .AND. VAL(x) > VAL(LEFT(y, AT('.', y))) )
+						.OR.
+						(  AT('.', x) > 0 .AND. At('.', y) = 0 .AND. VAL(LEFT(x, AT('.', x))) > VAL(y) )
+						.OR.
+						(  AT('.', x) = 0 .AND. At('.', y) = 0 .AND. VAL(x) > VAL(y)  )
+					)
+			}
+		);
+
+:RETURN soils:toString();

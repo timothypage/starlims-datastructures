@@ -1,0 +1,72 @@
+/********************************************************************************
+Description.. :	a STACK LIFO datastructure. - Last In, First Out
+
+Methods...... :	size() - returns the length of the stack.
+				push() - adds a new element to the top of the stack
+				peek() - returns the top element 
+				pop()  - returns and removes the top element
+
+Returns...... :	- 
+
+Author....... :	WOLANSKIP
+Date......... : 2011-04-02
+********************************************************************************
+_______________________________________________________________________________
+
+Modification. : 
+Author....... :	
+Date......... :	
+_______________________________________________________________________________
+********************************************************************************/;
+
+:CLASS Stack ;
+
+:DECLARE _stack ;
+
+:PROCEDURE constructor;
+
+	/* initialize the stack array ;
+	Me:_stack := {} ;
+:ENDPROC;
+
+:PROCEDURE size;
+	
+	/* return the number of items on the stack ; 	
+	:RETURN LEN( Me:_stack ) ;
+:ENDPROC;
+
+:PROCEDURE peek;
+	
+	/* peek returns the top element without popping it ;
+
+	/* copy the item to memory ;
+	item := Me:_stack[ LEN(Me:_stack) ] ;
+	
+	:RETURN item ;
+	
+:ENDPROC;
+
+:PROCEDURE push;
+	:PARAMETERS item ;
+	
+	aAdd( Me:_stack, item  ) ;
+	
+:ENDPROC;
+
+:PROCEDURE pop ;
+	
+	:DECLARE item;
+	
+	:IF Len( Me:_stack ) = 0 ;
+		RaiseError( "Stack Size is Zero!", "DataStructures.clsStack:pop()", 12534 );
+	:ENDIF;
+	
+	/* copy the item to memory ;
+	item := Me:peek() ;
+
+	/* Delete the last element ;
+	DelArray( Me:_stack, LEN(Me:_stack) ) ;
+
+	
+	:RETURN item ;
+:ENDPROC;

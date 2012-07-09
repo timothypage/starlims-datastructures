@@ -1,0 +1,47 @@
+/********************************************************************************
+Description.. :	
+
+Parameters... :	- 
+
+Returns...... :	- 
+
+Author....... :	WOLANSKIP
+Date......... : 2011-09-14
+********************************************************************************
+_______________________________________________________________________________
+
+Ticket #..... :	
+Modification. : 
+Author....... :	
+Date......... :	
+_______________________________________________________________________________
+********************************************************************************/;
+
+
+
+:DECLARE xml_node, xml_root;
+:DECLARE i;
+xml_root := CreateUdObject("Parsers.clsXMLElement", {} );
+
+xml_root:name := "ORU_R01" ;
+	
+	
+	
+/* MSH SECTION ;	
+	xml_node := CreateUdObject("Parsers.clsXMLElement", {} ) ;
+	xml_node:name := "MSH";
+
+
+
+:FOR i := 1 :TO 10 ;
+	xml_node := CreateUdObject("Parsers.clsXMLElement", {} ) ;
+	
+	xml_node:name := LimsString(i);
+	xml_node:value := "Value of " + limsstring(i);
+	/* xml_node:short := .T. ;
+	
+	aAdd( xml_root:children, xml_node );
+:NEXT;
+
+
+:RETURN xml_root:serialize();

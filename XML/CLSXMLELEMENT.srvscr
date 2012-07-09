@@ -1,0 +1,264 @@
+/********************************************************************************
+Description.. :	XMLElement - class - has attributes
+				name		- XML element name.
+				value		- any string between beginning and end tags.
+				attributes	- 2d array of element attributes, {  {id, 15}, {size, 20} } etc
+				children	- array of XMLelements that are child nodes
+				id			- a numeric number hopefully unique in the tree
+				parent_id	- a numeric number that should point to a unique number in the tree 
+				short       - boolean - is this a short tag?
+				
+				
+Methods...... : serialize - returns a nested text description of the xml element tree
+				explode - this should be a string function, but it "explodes" a string into an array based on a needle.
+				parse_attributes - this takes a string and explodes on spaces, and then equal signs and assigns the attributes property.
+				deserialize - this returns a 2d array including children for creating a TreeView.
+				
+				
+
+Parameters... :	NONE
+
+Returns...... :	NONE
+
+Author....... :	WOLANSKIP
+Date......... : 2011-03-30
+********************************************************************************
+_______________________________________________________________________________
+
+Modification. : 
+Author....... :	
+Date......... :	
+_______________________________________________________________________________
+********************************************************************************/;
+
+:CLASS XMLElement ;
+
+
+:DECLARE name ;
+:DECLARE value ;
+:DECLARE attributes ;
+:DECLARE children ;
+:DECLARE id ;
+:DECLARE parent_id ;
+:DECLARE short;
+
+:PROCEDURE constructor;
+	Me:name := "";
+	Me:value := "";
+	Me:attributes := {};
+	Me:children := {} ;
+	Me:id := 0 ;
+	Me:parent_id := 0 ;
+	Me:short := .F. ;
+:ENDPROC;
+
+:PROCEDURE deserialize; /* spit out the xml class as a 2d array ;
+	:PARAMETERS parent_name ;
+	
+	:DEFAULT parent_name,  "";
+	
+
+	
+	/* Need to return a treeview data structure. this is a 2d array. ;
+
+	/*tree := DoProc( "aUnique", { tree } ) ;
+
+	/*:RETURN GetDataSetFromArray(tree, {'Name', 'Text', 'Value', 'Parent', 'Image', 'SelectedImage'});
+
+	:DECLARE Image;
+	:DECLARE SelectedImage ;
+	:DECLARE Parent ;
+	:DECLARE Value;
+	:DECLARE Name;
+	:DECLARE Text ;
+	
+	:DECLARE nodes ;
+	:DECLARE i, j ;
+	nodes := {} ;
+	
+
+	/* build one for each element for now. Later add in attributes. ;
+	Name := parent_name + '_' + LIMSSTRING( Me:id ) + Me:name ; /* name should be parent + name ;
+	Text := Me:name + ' = ' + Me:value ;
+	Parent := parent_name ;
+	Value := Me:value ;
+	Image := "RUNTIME_SUPPORT.GetImageById.lims?ImageId=40B40CD2-E19E-0844-92EA-0D7BD70D947B";
+	SelectedImage := Image ;
+	
+	
+	aAdd( nodes, { Name, Text, Value, Parent, Image, SelectedImage } ) ;
+	
+	
+	/* attributes image: RUNTIME_SUPPORT.GetImageById.lims?ImageId=8C402696-9916-5D42-94CB-FDC861C8116B ;
+	
+	:FOR i := 1 :TO LEN(Me:attributes ) ;
+		aAdd( nodes, { Name + '_' + Me:attributes[i,1], 
+						Me:attributes[i,1] + ' = ' + Me:attributes[i,2], 
+						Me:Attributes[i,2], 
+						Name,
+						'RUNTIME_SUPPORT.GetImageById.lims?ImageId=8C402696-9916-5D42-94CB-FDC861C8116B',
+						'RUNTIME_SUPPORT.GetImageById.lims?ImageId=8C402696-9916-5D42-94CB-FDC861C8116B'
+						} ) ;
+	:NEXT;
+	
+	
+	
+	:DECLARE children_nodes ;
+	
+	:FOR i := 1 :TO LEN(Me:children) ;
+	
+		children_nodes := Me:children[i]:deserialize( Name ) ;
+		
+		:FOR j := 1 :TO LEN(children_nodes);
+			aAdd( nodes, children_nodes[j] );
+		:NEXT;
+		
+		
+	:NEXT;	
+	
+	:RETURN nodes  ;
+
+:ENDPROC;
+
+
+
+:PROCEDURE serialize;
+	:PARAMETERS depth ;
+	:DEFAULT depth, 1;
+	
+	:DECLARE sBuffer, i;
+	:DECLARE childTab, myTab;
+	
+	
+	childTab    := "";
+	myTab 		:= "";
+	sBuffer		:= "<?xml version=" + Chr(34) + "1.0" + Chr(34) + "?>" + Chr(13);
+	
+	:FOR i := 1 :TO depth :STEP 1 ;
+		childTab := childTab + "    " ;
+	:NEXT;
+	
+	myTab := LEFT( childTab, 4 * (depth - 1) ) ;
+	
+	
+	
+	sBuffer := myTab + '<' + Me:name ;
+	
+	:IF LEN(Me:attributes) > 0 ;
+		:FOR i := 1 :TO LEN(Me:attributes) :STEP 1 ;
+			sBuffer := sBuffer + " " + Me:attributes[i][1] + '="' + Me:attributes[i][2] + '"' ;
+		:NEXT ;
+	:ENDIF;
+	
+	:IF Me:short = .T. ;
+		sBuffer := sBuffer + '/>' + CHR(13) ;
+		:RETURN sBuffer ;
+	:ELSE;
+		sBuffer := sBuffer +  '>' ;
+	:ENDIF;
+	
+	
+	:IF LEN( Me:children ) >= 1 ;
+		sBuffer := sBuffer + chr(13) ;
+	:ENDIF;
+	
+	/*sBuffer := sTab + '<Element name="' + Me:name + '" value="' + Me:value + '" attribs = "' + BuildString( Me:attributes ) + '">'  + CHR(13) ;
+	
+	:FOR i := 1 :TO LEN(Me:children) ;
+		:DECLARE s;
+		s :=  Me:children[i]:serialize( depth + 1 ) ;
+		sBuffer := sBuffer + s ;
+	:NEXT;
+
+	:IF LEN( Me:children) > 0 ;
+		sBuffer := sBuffer + Me:value  + myTab ;
+	:ELSE;
+		sBuffer := sBuffer +  Me:value  ;
+	:ENDIF;
+	sBuffer := sBuffer  + '</' + Me:name + '>' + chr(13);
+
+	:RETURN sBuffer ;
+	
+:ENDPROC;
+
+:PROCEDURE add_attribute;
+	:PARAMETERS key, value ;
+	
+	aAdd( Me:attributes, { key, value} ) ;
+	
+:ENDPROC;
+
+:PROCEDURE get_attribute;
+	:PARAMETERS key;
+	
+	:DECLARE i;
+	:FOR i := 1 :TO LEN(Me:attributes);
+		:IF Me:attributes[i][1] = key ;
+			:RETURN Me:attributes[i][2];
+		:ENDIF;
+	:NEXT;
+	
+	:RETURN "";
+:ENDPROC;
+:PROCEDURE parse_attributes;
+	:PARAMETERS attribs;
+	
+	/* for the moment just shove the variable in. later, explode on =, remove "... etc ;
+	
+	
+	Me:attributes := attribs;
+	
+	:DECLARE attr, i;
+	
+	attr := {} ;
+	
+	:FOR i := 1 :TO LEN(attribs) :STEP 1 ;
+		aAdd( attr, Me:explode("=", attribs[i] ) ) ;
+		
+		:IF LEN( attr[LEN(attr)] ) < 2 ;
+			DelArray( attr, LEN(attr) ) ;
+			:LOOP;
+		:ENDIF;
+		attr[LEN(attr)][1] := alltrim ( strtran( attr[LEN(attr)][1], '=', '' ) ) ;
+		attr[LEN(attr)][2] := alltrim ( strtran( attr[LEN(attr)][2], '"', '' ) ) ;
+	:NEXT ;
+	
+	Me:attributes := attr; 
+:ENDPROC;
+
+
+
+
+:PROCEDURE explode ;
+	:PARAMETERS delimiter, string ;
+	
+	:DECLARE buffer ;
+	:DECLARE sIdx, count;
+	
+	buffer := {} ;
+	sIdx := 0;
+	count := 0;
+	
+	:WHILE !empty(string) ;
+		
+		sIdx := At( delimiter, string );
+		
+		:IF sIdx = 0 ;
+			sIdx := Len(string)  ;
+		:ENDIF;
+		
+		aAdd( buffer , Left(string, sIdx) );
+		
+		/*usrmes("String:" + string + chr(13) +
+				"Len(string): " + limsstring(len(string)) + CHR(13) +
+				"Piece: " + LEFT(string, sIdx) + CHR(13) +
+				"Len (delimiter):"  + limsstring(len(delimiter)) + CHR(13) +
+				"Index: " + limsstring(sIdx)
+				);
+		string := Right( string, Len(string) - (sIdx) );
+	
+	
+	:ENDWHILE;
+	
+	:RETURN buffer;
+:ENDPROC;

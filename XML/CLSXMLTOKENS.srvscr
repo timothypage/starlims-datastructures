@@ -1,0 +1,109 @@
+/********************************************************************************
+Description.. :	Declares the tokens required to parse XML
+
+Parameters... :	NONE
+
+Returns...... :	Declare a UDobject of this class to access the TOKENS, WHITE_SPACE properties.
+
+Author....... :	Parsers
+Date......... : 2011-06-14
+********************************************************************************
+_______________________________________________________________________________
+
+Modification. :
+Author....... :
+Date......... :
+_______________________________________________________________________________
+********************************************************************************/;
+
+:CLASS clsXmlTokens ;
+
+:DECLARE ALPHA_NUMERIC ;
+:DECLARE CONTENT ;
+:DECLARE EOF_TOKEN;
+:DECLARE EQUALS;
+:DECLARE FORWARD_SLASH;
+:DECLARE GREATER_THAN;
+:DECLARE LESS_THAN;
+:DECLARE QUESTION_MARK;
+:DECLARE QUOTATION ;
+:DECLARE TOKENS;
+:DECLARE WHITE_SPACE;
+
+
+:PROCEDURE constructor;
+
+	EOF_TOKEN := CreateUdObject( "Parsers.clsToken", {} ) ;
+	EOF_TOKEN:type := "EOF_TOKEN" ;
+	EOF_TOKEN:pattern := "";
+
+	WHITE_SPACE := CreateUdObject( "Parsers.clsToken", {} ) ;
+	WHITE_SPACE:type := "WHITE_SPACE" ;
+	WHITE_SPACE:pattern := " " + CHR(11) + chr(13) + CHR(10) + CHR(9);
+
+	ALPHA_NUMERIC := CreateUdObject("Parsers.clsToken", {} ) ;
+	ALPHA_NUMERIC:type := "ALPHA_NUMERIC" ;
+	ALPHA_NUMERIC:pattern := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890" ;
+	ALPHA_NUMERIC:pattern += ".,:!$%^&*()[]{}`~-_+" ;
+
+	CONTENT := CreateUdObject("Parsers.clsToken", {} );
+	CONTENT:type := "CONTENT";
+	CONTENT:pattern := ALPHA_NUMERIC:pattern + " \/"  + CHR(11) + chr(13) + CHR(10) + CHR(9) ;
+
+	LESS_THAN := CreateUdObject("Parsers.clsToken", {} ) ;
+	LESS_THAN:type := "LESS_THAN" ;
+	LESS_THAN:pattern := "<" ;
+
+	GREATER_THAN := CreateUdObject("Parsers.clsToken", {} ) ;
+	GREATER_THAN:type := "GREATER_THAN" ;
+	GREATER_THAN:pattern := ">" ;
+
+	FORWARD_SLASH := CreateUdObject("Parsers.clsToken", {} ) ;
+	FORWARD_SLASH:type := "FORWARD_SLASH" ;
+	FORWARD_SLASH:pattern := "/" ;
+
+	QUESTION_MARK := CreateUdObject("Parsers.clsToken", {} ) ;
+	QUESTION_MARK:type := "QUESTION_MARK" ;
+	QUESTION_MARK:pattern := "?" ;
+
+	EQUALS := CreateUdObject("Parsers.clsToken", {} ) ;
+	EQUALS:type := "EQUALS" ;
+	EQUALS:pattern := "=" ;
+
+	QUOTATION := CreateUdObject("Parsers.clsToken", {} ) ;
+	QUOTATION:type := "QUOTATION" ;
+	QUOTATION:pattern := '"' ;
+
+
+	/* the order here matters because when it does a search it uses the first one encountered that has a matching pattern... ;
+
+	TOKENS := {
+				WHITE_SPACE,
+				GREATER_THAN,
+				LESS_THAN,
+				FORWARD_SLASH,
+				QUESTION_MARK,
+				EQUALS,
+				QUOTATION,
+				ALPHA_NUMERIC,
+				CONTENT
+			} ;
+
+
+	:DECLARE i;
+	:FOR i := 1 :TO LEN(TOKENS) ;
+		TOKENS[i]:prepare();
+	:NEXT;
+
+:ENDPROC;
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,79 @@
+/********************************************************************************
+Description.. :	FIFO data structure
+
+Methods...... : size() - returns the length of the stack.
+				put()  - enqueues an item
+				peek() - returns the top element, without dequeueing it
+				get()  - returns and removes the top element
+
+Returns...... :	- 
+
+Author....... :	ZWOLAKT
+Date......... : 2012-06-14
+********************************************************************************
+_______________________________________________________________________________
+
+Ticket #..... :	
+Modification. : 
+Author....... :	
+Date......... :	
+_______________________________________________________________________________
+********************************************************************************/;
+
+:CLASS Queue;
+
+:DECLARE _queue;
+
+:PROCEDURE constructor;
+
+	/* initialize the queue array ;
+	Me:_queue := {};
+	
+:ENDPROC;
+
+:PROCEDURE size;
+	
+	/* return the number of items in the queue ;
+	:RETURN Len( Me:_queue );
+
+:ENDPROC;
+
+:PROCEDURE peek;
+	/* return the top element without dequeuing it ;
+	
+	/* copy the item to memory ;
+	:RETURN Me:_queue[1];
+	
+:ENDPROC;
+
+:PROCEDURE put;
+	:PARAMETERS item;
+	
+	/* enqueue item ;
+	aAdd( Me:_queue, item );
+	
+	
+:ENDPROC;
+
+:PROCEDURE get;
+
+	:DECLARE item;
+	
+	:IF Len( Me:_queue ) = 0 ;
+		RaiseError( "Queue Size is Zero!", "DataStructures.clsQueue:pop()", 12535 );
+	:ENDIF;
+	
+	/* copy the first item to memory ;
+	item := Me:peek();
+	
+	/* Delete the first item ;
+	DelArray( Me:_queue, 1 );
+	
+	:RETURN item ;
+	
+:ENDPROC;
+
+
+
+
+
