@@ -1,10 +1,10 @@
 /********************************************************************************
 Description.. :	FIFO data structure
 
-Methods...... : size() - returns the length of the stack.
-				put()  - enqueues an item
-				peek() - returns the top element, without dequeueing it
-				get()  - returns and removes the top element
+Methods...... : 	size() - returns the length of the queue.
+			put()  - enqueues an item
+			peek() - returns the top element, without dequeueing it
+			get()  - returns and removes the top element
 
 Returns...... :	- 
 
