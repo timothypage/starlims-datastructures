@@ -1,7 +1,7 @@
 Starlims Data Structures
 ========================
 
-This is just a small collection of starlims data structures I've used.
+This is just a small collection of starlims data structures we've used.
 
  - stack
  - queue
